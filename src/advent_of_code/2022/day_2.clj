@@ -1,5 +1,6 @@
 (ns advent-of-code.2022.day-2
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clojure.set :refer [map-invert]]))
 
 (def lookup
   {"A" :rock
@@ -9,15 +10,22 @@
    "X" :rock
    "Y" :paper
    "Z" :scissors})
-
-(def file-contents "A Y
-B X
-C Z")
+(def lookup-outcome
+  {"X" :loss
+   "Y" :tie
+   "Z" :win})
+(def score-shape
+  {:rock     1
+   :paper    2
+   :scissors 3})
+(def win-bonus 6)
+(def tie-bonus 3)
+(def loss-bonus 0)
 
 (def defeated-by {:rock :scissors
                   :paper     :rock
                   :scissors    :paper})
-(def defeats (clojure.set/map-invert defeated-by))
+(def defeats (map-invert defeated-by))
 
 (defn win? [them me]
   (= them (defeated-by me)))
@@ -25,44 +33,37 @@ C Z")
 (defn tie? [them me]
   (= them me))
 
-(def win-bonus 6)
-(def tie-bonus 3)
-
-(def shape-score {:rock     1
-                  :paper    2
-                  :scissors 3})
-
 (defprotocol Scoreable
   (score [round] "Score a round of rock, paper, scissors"))
 
 (defrecord ShapeRound [their-shape my-shape]
   Scoreable
   (score [{:keys [their-shape my-shape]}]
-    [their-shape my-shape]
-  (cond
-    (win? their-shape my-shape)
-    (+ (shape-score my-shape) win-bonus)
+    (let [base-score (score-shape my-shape)]
+      (+ base-score
+         (cond
+           (win? their-shape my-shape)
+           win-bonus
 
-    (tie? their-shape my-shape)
-    (+ (shape-score my-shape) tie-bonus)
+           (tie? their-shape my-shape)
+           tie-bonus
 
-    :else
-    (shape-score my-shape))))
-
-(def lookup-outcome {"X" :loss
-                     "Y" :tie
-                     "Z" :win})
+           :else
+           loss-bonus)))))
 
 (defrecord WinLossRound [their-shape outcome]
   Scoreable
   (score [{:keys [their-shape outcome]}]
-    (case outcome
-      :win
-      (score (->ShapeRound their-shape (defeats their-shape)))
-      :loss
-      (score (->ShapeRound their-shape (defeated-by their-shape)))
-      :tie
-      (score (->ShapeRound their-shape their-shape)))))
+    (score (->ShapeRound their-shape
+                         (case outcome
+                           :win
+                           (defeats their-shape)
+
+                           :loss
+                           (defeated-by their-shape)
+
+                           :tie
+                           their-shape)))))
 
 (defn- parse-file-contents [file-contents]
   (map #(str/split % #" ")
@@ -95,3 +96,6 @@ C Z")
          (map create-win-loss-round)
          (map score)
          (reduce +))))
+
+(comment (solution2 );; => 14470
+)
