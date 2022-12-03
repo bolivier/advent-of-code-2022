@@ -26,7 +26,6 @@ C Z")
 
 (def win-bonus 6)
 (def tie-bonus 3)
-(def loss-bonus 0)
 
 (def shape-score {:rock     1
                   :paper    2
