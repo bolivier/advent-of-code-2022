@@ -52,6 +52,19 @@ C Z")
 (defmethod score-round :loss [them me]
   (shape-score me))
 
+
+
+(defprotocol Scoreable
+  (score [round] "Score a round of rock, paper, scissors"))
+
+(defrecord ShapeRound [their-shape my-shape]
+  Scoreable
+  (score [{:keys [their-shape my-shape]}]
+    (score-round their-shape my-shape)))
+
+(defrecord WinLossRound [their-shape outcome])
+
+
 (defn solution []
   (let [file-contents (slurp "inputs/2022/day-2")]
    (reduce + (map
