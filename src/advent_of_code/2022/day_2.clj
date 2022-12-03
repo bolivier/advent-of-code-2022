@@ -61,5 +61,5 @@ C Z")
               (map #(map lookup %) (map #(str/split % #" ")
                                         (str/split-lines file-contents)))))))
 
-(solution )
-;; => 12679
+(comment (solution );; => 12679
+)
