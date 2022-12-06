@@ -23,19 +23,23 @@
          (rest coll)
          (inc idx))))))
 
+(defn chars-required-for-unique-message
+  "Partition the buffer into partitions of size `size`.
+
+  Runs `index-of` against those.
+
+  Not suitable for massive data."
+  [buffer size]
+  (let [idx (index-of starter? (partition size 1 buffer))]
+    (+ size idx)))
+
 (defn solution []
-  (let [input (str/split (slurp "inputs/2022/day-6") #"")
-        #_#_input "bvwbjplbgvbhsrlpgdmjqwftvncz"
-        idx (index-of starter?
-                      (partition 4 1 input))]
-    (+ 4 idx)))
+  (let [input (str/split (slurp "inputs/2022/day-6") #"")]
+    (chars-required-for-unique-message input 4)))
 
 (defn solution2 []
-  (let [input (str/split (slurp "inputs/2022/day-6") #"")
-        #_#_input "bvwbjplbgvbhsrlpgdmjqwftvncz"
-        idx (index-of starter?
-                      (partition 14 1 input))]
-    (+ 14 idx)))
+  (let [input (str/split (slurp "inputs/2022/day-6") #"")]
+    (chars-required-for-unique-message input 14)))
 
 (comment
   (solution)
